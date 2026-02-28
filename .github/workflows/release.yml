@@ -2,18 +2,22 @@ name: Release
 
 on:
   push:
-    tags:
-      - "v*"
+    branches:
+      - "main"
   workflow_dispatch:
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
+      issues: write
+      pull-requests: write
       id-token: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-node@v4
         with:
@@ -22,6 +26,7 @@ jobs:
           cache: npm
 
       - run: npm ci
-      - run: npm publish
+      - run: npx semantic-release
         env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
