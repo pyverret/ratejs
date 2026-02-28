@@ -1,0 +1,64 @@
+{
+  "name": "ratejs",
+  "version": "1.0.0",
+  "description": "Lightweight, dependency-free TypeScript financial math library providing pure calculation utilities.",
+  "author": "Pierre-Yves Verret",
+  "license": "ISC",
+  "keywords": [
+    "finance",
+    "financial-math",
+    "interest",
+    "loan",
+    "amortization",
+    "irr",
+    "cagr",
+    "time-value-of-money",
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pyverret/ratejs.git"
+  },
+  "bugs": {
+    "url": "https://github.com/pyverret/ratejs/issues"
+  },
+  "homepage": "https://github.com/pyverret/ratejs#readme",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "lint": "biome check .",
+    "lint:fix": "biome check . --write",
+    "format": "biome format . --write",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "prepublishOnly": "npm run lint && npm run typecheck && npm test && npm run build"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.4",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}
