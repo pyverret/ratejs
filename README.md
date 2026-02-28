@@ -1,11 +1,11 @@
-﻿# ratejs
+﻿# @pyverret/ratejs
 
 Lightweight, dependency-free TypeScript financial math library providing pure calculation utilities.
 
 ## Install
 
 ```bash
-npm i ratejs
+npm i @pyverret/ratejs
 ```
 
 ## Usage

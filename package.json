@@ -1,5 +1,5 @@
 {
-  "name": "ratejs",
+  "name": "@pyverret/ratejs",
   "version": "1.0.0",
   "description": "Lightweight, dependency-free TypeScript financial math library providing pure calculation utilities.",
   "author": "Pierre-Yves Verret",
