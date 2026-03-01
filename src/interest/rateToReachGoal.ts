@@ -1,4 +1,5 @@
 import { assertNonNegative, assertPositive } from "../utils/assertions.js";
+import { bisection, newtonRaphson } from "../utils/solvers.js";
 
 export type RateToReachGoalParams = {
   principal: number;
@@ -34,32 +35,40 @@ export function rateToReachGoal(params: RateToReachGoalParams): number {
     return (targetFutureValue / principal) ** (1 / periods) - 1;
   }
 
-  // FV = principal*(1+r)^n + PMT * ((1+r)^n - 1)/r (ordinary) or PMT * (1+r) * ((1+r)^n - 1)/r (due)
-  // Solve for r with Newton-Raphson
   const dueFactor = contributionTiming === "begin" ? 1 : 0;
-  let r = (targetFutureValue / (principal + contributionPerPeriod * periods)) ** (1 / periods) - 1;
-  if (r <= -1) r = 0.01;
-
-  for (let i = 0; i < 100; i++) {
+  const fn = (r: number) => {
     const onePlusR = 1 + r;
     const onePlusRN = onePlusR ** periods;
     const fvLump = principal * onePlusRN;
-    const annuity = contributionPerPeriod * ((onePlusRN - 1) / (r || 1e-14)) * (1 + dueFactor * r);
-    const fv = fvLump + annuity;
-    const err = fv - targetFutureValue;
-    if (Math.abs(err) < 1e-10) return r;
-    // Derivative approximation
-    const dr = r * 1e-6 || 1e-10;
-    const r2 = r + dr;
-    const onePlusR2 = 1 + r2;
-    const onePlusR2N = onePlusR2 ** periods;
-    const fv2 =
-      principal * onePlusR2N +
-      contributionPerPeriod * ((onePlusR2N - 1) / r2) * (1 + dueFactor * r2);
-    const dFvDr = (fv2 - fv) / dr;
-    r = r - err / dFvDr;
-    if (r <= -1) r = 0.01;
-    if (r > 10) r = 10;
-  }
-  return r;
+    const annuityBase = r === 0 ? periods : (onePlusRN - 1) / r;
+    const fvAnnuity = contributionPerPeriod * annuityBase * (1 + dueFactor * r);
+    return fvLump + fvAnnuity - targetFutureValue;
+  };
+  const derivative = (r: number) => {
+    const delta = Math.abs(r) > 1e-6 ? Math.abs(r) * 1e-6 : 1e-6;
+    return (fn(r + delta) - fn(r - delta)) / (2 * delta);
+  };
+
+  const initialGuess =
+    (targetFutureValue / (principal + contributionPerPeriod * periods)) ** (1 / periods) - 1;
+
+  const newton = newtonRaphson({
+    initialGuess: Number.isFinite(initialGuess) ? Math.max(initialGuess, -0.99) : 0.01,
+    fn,
+    derivative,
+    tolerance: 1e-10,
+    maxIterations: 100,
+    min: -0.99,
+    max: 10,
+  });
+  if (newton !== undefined) return newton;
+
+  const bisected = bisection({
+    fn,
+    lower: -0.99,
+    upper: 10,
+    tolerance: 1e-10,
+    maxIterations: 200,
+  });
+  return bisected ?? Number.NaN;
 }

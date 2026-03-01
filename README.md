@@ -12,6 +12,44 @@ npm i @pyverret/ratejs
 
 All functions take a single options object (no positional args). Rates are decimals (e.g. `0.05` = 5%).
 
+Cash-flow sign convention (Excel-style):
+- Cash paid out is negative, cash received is positive.
+- Loan example: `presentValue > 0` and `payment < 0`.
+- Investment withdrawal example: `presentValue < 0` and `payment > 0`.
+
+### Excel-style TVM formulas
+
+- **`pmt`** - Excel `PMT`: payment per period for a loan/investment.
+- **`pv`** - Excel `PV`: present value from payment stream and future value.
+- **`fv`** - Excel `FV`: future value from present value and payment stream.
+- **`nper`** - Excel `NPER`: number of periods required.
+- **`rate`** - Excel `RATE`: implied rate per period. Supports optional `guess`, `maxIterations`, `lowerBound`, and `upperBound`.
+- **`npv`** - Excel `NPV`: net present value of a cash flow series.
+
+```ts
+const payment = pmt({
+  ratePerPeriod: 0.06 / 12,
+  periods: 360,
+  presentValue: 250000,
+  futureValue: 0,
+  timing: "end",
+});
+
+const impliedRate = rate({
+  periods: 360,
+  payment,
+  presentValue: 250000,
+  futureValue: 0,
+  timing: "end",
+  lowerBound: -0.99, // optional
+  upperBound: 10, // optional
+});
+```
+
+Edge cases:
+- `nper` throws `RangeError` when `ratePerPeriod <= -1`.
+- `rate` throws `RangeError` when no root is found within search bounds.
+
 ### Interest & growth
 
 - **`compound`** - Final amount for a lump sum with compound interest.
@@ -95,11 +133,22 @@ ruleOf72({ rate: 0.07, constant: 69 });
 cagr({ startValue: 1000, endValue: 2000, years: 10 });
 ```
 
-- **`irr`** - Internal rate of return: discount rate that makes NPV of cash flows zero. `cashFlows[0]` is typically the initial outlay (negative).
+- **`irr`** - Internal rate of return: discount rate that makes NPV of cash flows zero. `cashFlows[0]` is typically the initial outlay (negative). Supports optional `guess`, `maxIterations`, `lowerBound`, and `upperBound`.
 
 ```ts
-irr({ cashFlows: [-1000, 300, 400, 500], guess: 0.1, maxIterations: 100 });
+irr({
+  cashFlows: [-1000, 300, 400, 500],
+  guess: 0.1,
+  maxIterations: 100,
+  lowerBound: -0.99, // optional
+  upperBound: 10, // optional
+});
 ```
+
+Edge cases:
+- Throws `RangeError` when `cashFlows` is empty.
+- Throws `RangeError` when `cashFlows` does not contain at least one positive and one negative value.
+- Throws `RangeError` when no root is found within search bounds.
 
 ### Inflation
 

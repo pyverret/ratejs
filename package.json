@@ -6,11 +6,15 @@
   "license": "ISC",
   "keywords": [
     "finance",
+    "excel",
     "financial-math",
     "interest",
     "loan",
     "amortization",
     "irr",
+    "npv",
+    "pmt",
+    "nper",
     "cagr",
     "time-value-of-money",
     "typescript"
