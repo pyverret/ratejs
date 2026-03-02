@@ -83,6 +83,27 @@ describe("excel-style tvm formulas", () => {
     expect(solvedRate).toBeCloseTo(0.05 / 12, 8);
   });
 
+  it("rate handles non-finite values at high upper bounds", () => {
+    const payment = pmt({
+      ratePerPeriod: 0.0575 / 12,
+      periods: 360,
+      presentValue: 420000,
+      futureValue: 0,
+      timing: "end",
+    });
+    const solvedRate = rate({
+      periods: 360,
+      payment,
+      presentValue: 420000,
+      futureValue: 0,
+      timing: "end",
+      guess: 0.005,
+      lowerBound: -0.99,
+      upperBound: 10,
+    });
+    expect(solvedRate).toBeCloseTo(0.0575 / 12, 8);
+  });
+
   it("rate can converge when initial bounds miss the root", () => {
     const payment = pmt({
       ratePerPeriod: 0.01,

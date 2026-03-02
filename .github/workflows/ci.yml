@@ -22,3 +22,12 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      - run: npm ci
+        working-directory: demo
+        if: matrix.node == '20.19.0'
+      - run: npx playwright install --with-deps chromium
+        working-directory: demo
+        if: matrix.node == '20.19.0'
+      - run: npm run test:smoke
+        working-directory: demo
+        if: matrix.node == '20.19.0'

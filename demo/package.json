@@ -1,0 +1,17 @@
+{
+  "name": "ratejs-demo",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build:lib": "npm run --prefix .. build",
+    "dev": "npm run build:lib && vite",
+    "build": "npm run build:lib && vite build",
+    "preview": "vite preview",
+    "test:smoke": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.1",
+    "vite": "^7.3.1"
+  }
+}

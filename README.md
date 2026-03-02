@@ -8,6 +8,19 @@ Lightweight, dependency-free TypeScript financial math library providing pure ca
 npm i @pyverret/ratejs
 ```
 
+## Live Demo
+
+- GitHub Pages URL: `https://pyverret.github.io/ratejs/`
+- Demo source: [`demo/`](./demo)
+
+Run locally:
+
+```bash
+cd demo
+npm install
+npm run dev
+```
+
 ## Usage
 
 All functions take a single options object (no positional args). Rates are decimals (e.g. `0.05` = 5%).

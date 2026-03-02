@@ -1,0 +1,258 @@
+:root {
+  --bg: #eef4fb;
+  --ink: #162034;
+  --muted: #5e6d86;
+  --accent: #0f9d7a;
+  --accent-2: #ff7a59;
+  --accent-soft: #d7f6ee;
+  --card: #ffffff;
+  --border: #cfdced;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  color: var(--ink);
+  background:
+    linear-gradient(160deg, #eef4fb 0%, #f6fbff 45%, #eef8f2 100%);
+  font-family: "Space Grotesk", system-ui, sans-serif;
+}
+
+.app {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 40px 20px 72px;
+}
+
+.hero {
+  margin-bottom: 28px;
+  position: relative;
+}
+
+.hero::after {
+  content: "";
+  display: block;
+  margin-top: 14px;
+  width: 180px;
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+}
+
+.eyebrow {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0;
+}
+
+h1 {
+  margin: 8px 0;
+  font-size: clamp(2rem, 4vw, 3.1rem);
+  line-height: 1.04;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.subtitle {
+  margin: 0;
+  max-width: 68ch;
+  color: var(--muted);
+}
+
+.grid {
+  display: grid;
+  gap: 22px;
+}
+
+.group {
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(3px);
+  padding: 14px;
+}
+
+.group-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.group-header h2 {
+  margin: 0 0 4px;
+  font-size: 1.05rem;
+}
+
+.group-header p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.group-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.group-grid.is-collapsed {
+  display: none;
+}
+
+.group-toggle {
+  border: 1px solid var(--border);
+  background: #f9fcff;
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.group-toggle:hover {
+  border-color: var(--accent);
+  background: #e9f7f2;
+  color: #0f5847;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow:
+    0 6px 16px rgba(16, 32, 64, 0.07),
+    0 18px 44px rgba(16, 32, 64, 0.08);
+  transform: translateY(8px);
+  opacity: 0;
+  animation: rise 600ms ease forwards;
+}
+
+.card h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.card-subtitle {
+  margin: 8px 0 14px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.input {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.input span {
+  color: var(--muted);
+  font-size: 12px;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+.input input,
+.input select {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 10px;
+  font: inherit;
+  background: #fbfdff;
+}
+
+.input input:focus,
+.input select:focus {
+  outline: 2px solid var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.results {
+  display: grid;
+  gap: 2px;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 0 0 10px;
+}
+
+.btn {
+  border: 1px solid var(--border);
+  background: #f9fcff;
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 5px 10px;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 140ms ease;
+}
+
+.btn:hover {
+  border-color: var(--accent);
+  background: #e9f7f2;
+  color: #0f5847;
+}
+
+.kv {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 0;
+  border-top: 1px dashed var(--border);
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 13px;
+}
+
+.kv:first-of-type {
+  border-top: 0;
+}
+
+.kv b {
+  color: var(--accent);
+}
+
+.error {
+  border: 1px solid #e7b8b8;
+  background: #fff2f2;
+  color: #8e2f2f;
+  border-radius: 10px;
+  padding: 10px;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 12px;
+}
+
+@keyframes rise {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .app {
+    padding-top: 28px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
