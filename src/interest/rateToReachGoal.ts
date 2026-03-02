@@ -1,4 +1,4 @@
-import { assertNonNegative, assertPositive } from "../utils/assertions.js";
+import { assertFiniteNumber, assertNonNegative, assertPositive } from "../utils/assertions.js";
 import { bisection, newtonRaphson } from "../utils/solvers.js";
 
 export type RateToReachGoalParams = {
@@ -7,6 +7,10 @@ export type RateToReachGoalParams = {
   periods: number;
   contributionPerPeriod?: number;
   contributionTiming?: "end" | "begin";
+  lowerBound?: number;
+  upperBound?: number;
+  maxIterations?: number;
+  tolerance?: number;
 };
 
 /**
@@ -20,18 +24,37 @@ export function rateToReachGoal(params: RateToReachGoalParams): number {
     periods,
     contributionPerPeriod = 0,
     contributionTiming = "end",
+    lowerBound = -0.99,
+    upperBound = 10,
+    maxIterations = 100,
+    tolerance = 1e-10,
   } = params;
 
   assertNonNegative(principal, "principal");
   assertNonNegative(targetFutureValue, "targetFutureValue");
   assertPositive(periods, "periods");
   assertNonNegative(contributionPerPeriod, "contributionPerPeriod");
+  assertFiniteNumber(lowerBound, "lowerBound");
+  assertFiniteNumber(upperBound, "upperBound");
+  assertFiniteNumber(maxIterations, "maxIterations");
+  assertFiniteNumber(tolerance, "tolerance");
+  if (lowerBound <= -1) throw new RangeError("lowerBound must be > -1");
+  if (upperBound <= lowerBound) throw new RangeError("upperBound must be greater than lowerBound");
+  if (!Number.isInteger(maxIterations) || maxIterations <= 0) {
+    throw new RangeError("maxIterations must be a positive integer");
+  }
+  if (tolerance <= 0) throw new RangeError("tolerance must be > 0");
 
   if (periods === 0) return 0;
   if (targetFutureValue <= principal && contributionPerPeriod === 0) return 0;
 
   if (contributionPerPeriod === 0) {
     if (targetFutureValue <= principal) return 0;
+    if (principal === 0) {
+      throw new RangeError(
+        "rateToReachGoal is undefined when principal is 0 and contributions are 0",
+      );
+    }
     return (targetFutureValue / principal) ** (1 / periods) - 1;
   }
 
@@ -53,22 +76,67 @@ export function rateToReachGoal(params: RateToReachGoalParams): number {
     (targetFutureValue / (principal + contributionPerPeriod * periods)) ** (1 / periods) - 1;
 
   const newton = newtonRaphson({
-    initialGuess: Number.isFinite(initialGuess) ? Math.max(initialGuess, -0.99) : 0.01,
+    initialGuess: Number.isFinite(initialGuess) ? Math.max(initialGuess, lowerBound) : 0.01,
     fn,
     derivative,
-    tolerance: 1e-10,
-    maxIterations: 100,
-    min: -0.99,
-    max: 10,
+    tolerance,
+    maxIterations,
+    min: lowerBound,
+    max: upperBound,
   });
   if (newton !== undefined) return newton;
 
+  const bracket = findBracket(fn, lowerBound, upperBound);
+  if (bracket === undefined) {
+    throw new RangeError("rateToReachGoal did not converge within search bounds");
+  }
+  if (bracket.lower === bracket.upper) return bracket.lower;
+
   const bisected = bisection({
     fn,
-    lower: -0.99,
-    upper: 10,
-    tolerance: 1e-10,
-    maxIterations: 200,
+    lower: bracket.lower,
+    upper: bracket.upper,
+    tolerance,
+    maxIterations: maxIterations * 2,
   });
-  return bisected ?? Number.NaN;
+  if (bisected !== undefined) return bisected;
+  throw new RangeError("rateToReachGoal did not converge");
+}
+
+function findBracket(
+  fn: (x: number) => number,
+  lowerBound: number,
+  upperBound: number,
+): { lower: number; upper: number } | undefined {
+  const scan = (
+    start: number,
+    end: number,
+    segments = 200,
+  ): { lower: number; upper: number } | undefined => {
+    let prevX: number | undefined;
+    let prevValue: number | undefined;
+    for (let i = 0; i <= segments; i++) {
+      const x = start + ((end - start) * i) / segments;
+      const value = fn(x);
+      if (!Number.isFinite(value)) continue;
+      if (value === 0) return { lower: x, upper: x };
+      if (prevX !== undefined && prevValue !== undefined && prevValue * value < 0) {
+        return { lower: prevX, upper: x };
+      }
+      prevX = x;
+      prevValue = value;
+    }
+    return undefined;
+  };
+
+  let lower = lowerBound;
+  let upper = upperBound;
+  for (let i = 0; i < 20; i++) {
+    const bracket = scan(lower, upper);
+    if (bracket !== undefined) return bracket;
+    lower = Math.max(-0.999999999, (lower - 1) / 2);
+    upper = upper * 2 + 1;
+  }
+
+  return scan(lower, upper, 400);
 }

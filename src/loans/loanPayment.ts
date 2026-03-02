@@ -1,4 +1,4 @@
-import { assertNonNegative, assertPositive } from "../utils/assertions.js";
+import { assertFiniteNumber, assertNonNegative, assertPositive } from "../utils/assertions.js";
 
 export type LoanPaymentParams = {
   principal: number;
@@ -16,6 +16,7 @@ export type LoanPaymentParams = {
 export function loanPayment(params: LoanPaymentParams): number {
   const { principal, annualRate, paymentsPerYear, years } = params;
   assertNonNegative(principal, "principal");
+  assertFiniteNumber(annualRate, "annualRate");
   assertPositive(paymentsPerYear, "paymentsPerYear");
   assertNonNegative(years, "years");
 
@@ -23,7 +24,14 @@ export function loanPayment(params: LoanPaymentParams): number {
   if (n === 0) return 0;
 
   const r = annualRate / paymentsPerYear;
+  if (r <= -1) {
+    throw new RangeError("annualRate / paymentsPerYear must be > -1");
+  }
   if (r === 0) return principal / n;
 
-  return (r * principal) / (1 - (1 + r) ** -n);
+  const value = (r * principal) / (1 - (1 + r) ** -n);
+  if (!Number.isFinite(value)) {
+    throw new RangeError("Numerical instability for given inputs");
+  }
+  return value;
 }

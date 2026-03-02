@@ -18,13 +18,16 @@ export function roundToCurrency(params: RoundToCurrencyParams): number {
   const factor = 10 ** d;
   if (mode === "half-even") {
     const scaled = value * factor;
-    const rounded = Math.round(scaled);
-    const remainder = Math.abs(scaled - rounded);
-    if (remainder === 0.5) {
-      const down = Math.floor(scaled);
-      return (down % 2 === 0 ? down : down + 1) / factor;
+    const sign = scaled < 0 ? -1 : 1;
+    const absScaled = Math.abs(scaled);
+    const floorAbs = Math.floor(absScaled);
+    const fraction = absScaled - floorAbs;
+    const epsilon = 1e-12;
+    if (Math.abs(fraction - 0.5) <= epsilon) {
+      const nearestEven = floorAbs % 2 === 0 ? floorAbs : floorAbs + 1;
+      return (sign * nearestEven) / factor;
     }
-    return rounded / factor;
+    return Math.round(scaled) / factor;
   }
   return Math.round(value * factor) / factor;
 }

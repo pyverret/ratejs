@@ -42,4 +42,14 @@ describe("returns", () => {
     });
     expect(r).toBeCloseTo(0.1, 8);
   });
+
+  it("irr handles non-finite evaluations at high upper bounds", () => {
+    const r = irr({
+      cashFlows: [-420000, ...Array(360).fill(2453.6747498448917)],
+      guess: 0.005,
+      lowerBound: -0.99,
+      upperBound: 10,
+    });
+    expect(r).toBeCloseTo(0.0048, 6);
+  });
 });

@@ -148,6 +148,30 @@ describe("excel-style tvm formulas", () => {
     ).toThrow(RangeError);
   });
 
+  it("fv, pv and pmt throw when ratePerPeriod is <= -1", () => {
+    expect(() =>
+      fv({
+        ratePerPeriod: -1,
+        periods: 12,
+        presentValue: 1000,
+      }),
+    ).toThrow(RangeError);
+    expect(() =>
+      pv({
+        ratePerPeriod: -1,
+        periods: 12,
+        payment: -100,
+      }),
+    ).toThrow(RangeError);
+    expect(() =>
+      pmt({
+        ratePerPeriod: -1,
+        periods: 12,
+        presentValue: 1000,
+      }),
+    ).toThrow(RangeError);
+  });
+
   it("npv matches manual discounted cash flow", () => {
     const r = 0.1;
     const cashFlows = [-1000, 400, 500, 300];

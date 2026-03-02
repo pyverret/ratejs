@@ -62,6 +62,7 @@ const impliedRate = rate({
 Edge cases:
 - `nper` throws `RangeError` when `ratePerPeriod <= -1`.
 - `rate` throws `RangeError` when no root is found within search bounds.
+- `pmt`, `pv`, and `fv` throw `RangeError` when `ratePerPeriod <= -1`.
 
 ### Interest & growth
 
@@ -118,6 +119,7 @@ periodsToReachGoal({
 Edge cases:
 - Returns `Infinity` when the goal is unreachable.
 - Throws `RangeError` when `rate / timesPerYear <= -1`.
+- Throws `RangeError` when `maxPeriods` is exceeded for contribution-based iteration.
 
 - **`rateToReachGoal`** - Rate per period required to reach a target future value in a given number of periods.
 
@@ -128,8 +130,13 @@ rateToReachGoal({
   periods: 24,
   contributionPerPeriod: 0,
   contributionTiming: "end",
+  lowerBound: -0.99, // optional
+  upperBound: 10, // optional
 });
 ```
+
+Edge cases:
+- Throws `RangeError` when no root is found within search bounds.
 
 - **`ruleOf72`** - Approximate years to double a lump sum at a given annual rate. Optional `constant: 69` for rule of 69.
 
@@ -224,6 +231,9 @@ loanPayment({
   years: 30,
 });
 ```
+
+Edge cases:
+- Throws `RangeError` when `annualRate / paymentsPerYear <= -1`.
 
 - **`amortizationSchedule`** - Full schedule: `{ paymentPerPeriod, schedule, totalPaid, totalInterest }`. Optional `extraPaymentPerPeriod`.
 

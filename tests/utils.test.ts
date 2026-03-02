@@ -10,6 +10,8 @@ describe("utils", () => {
   it("roundToCurrency half-even", () => {
     expect(roundToCurrency({ value: 2.125, mode: "half-even" })).toBe(2.12);
     expect(roundToCurrency({ value: 2.255, mode: "half-even" })).toBe(2.26);
+    expect(roundToCurrency({ value: 1.015, mode: "half-even" })).toBe(1.02);
+    expect(roundToCurrency({ value: -2.125, mode: "half-even" })).toBe(-2.12);
   });
 
   it("roundToCurrency custom decimals", () => {

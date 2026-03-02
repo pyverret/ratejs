@@ -20,9 +20,13 @@ function futureValueFromCashFlows(
   presentValue: number,
   timing: PaymentTiming,
 ): number {
+  if (ratePerPeriodIsInvalidForDomain(ratePerPeriod)) {
+    throw new RangeError("ratePerPeriod must be > -1");
+  }
   if (ratePerPeriod === 0) return -(presentValue + payment * periods);
 
   const growth = (1 + ratePerPeriod) ** periods;
+  if (!Number.isFinite(growth) || growth <= 0) return Number.NaN;
   const paymentFv =
     payment * ((growth - 1) / ratePerPeriod) * annuityDueFactor(ratePerPeriod, timing);
   return -(presentValue * growth + paymentFv);
@@ -47,7 +51,11 @@ export function fv(params: FvParams): number {
   assertFiniteNumber(presentValue, "presentValue");
   assertTiming(timing, "timing");
 
-  return futureValueFromCashFlows(ratePerPeriod, periods, payment, presentValue, timing);
+  const value = futureValueFromCashFlows(ratePerPeriod, periods, payment, presentValue, timing);
+  if (!Number.isFinite(value)) {
+    throw new RangeError("Numerical instability for given inputs");
+  }
+  return value;
 }
 
 export type PvParams = {
@@ -68,13 +76,23 @@ export function pv(params: PvParams): number {
   assertFiniteNumber(payment, "payment");
   assertFiniteNumber(futureValue, "futureValue");
   assertTiming(timing, "timing");
+  if (ratePerPeriodIsInvalidForDomain(ratePerPeriod)) {
+    throw new RangeError("ratePerPeriod must be > -1");
+  }
 
   if (ratePerPeriod === 0) return -(futureValue + payment * periods);
 
   const growth = (1 + ratePerPeriod) ** periods;
+  if (!Number.isFinite(growth) || growth <= 0) {
+    throw new RangeError("Numerical instability for given ratePerPeriod/periods");
+  }
   const paymentPv =
     ((payment * (1 - 1 / growth)) / ratePerPeriod) * annuityDueFactor(ratePerPeriod, timing);
-  return -futureValue / growth - paymentPv;
+  const value = -futureValue / growth - paymentPv;
+  if (!Number.isFinite(value)) {
+    throw new RangeError("Numerical instability for given inputs");
+  }
+  return value;
 }
 
 export type PmtParams = {
@@ -95,13 +113,23 @@ export function pmt(params: PmtParams): number {
   assertFiniteNumber(presentValue, "presentValue");
   assertFiniteNumber(futureValue, "futureValue");
   assertTiming(timing, "timing");
+  if (ratePerPeriodIsInvalidForDomain(ratePerPeriod)) {
+    throw new RangeError("ratePerPeriod must be > -1");
+  }
 
   if (ratePerPeriod === 0) return -(presentValue + futureValue) / periods;
 
   const growth = (1 + ratePerPeriod) ** periods;
+  if (!Number.isFinite(growth) || growth <= 0) {
+    throw new RangeError("Numerical instability for given ratePerPeriod/periods");
+  }
   const numerator = -(futureValue + presentValue * growth) * ratePerPeriod;
   const denominator = (growth - 1) * annuityDueFactor(ratePerPeriod, timing);
-  return numerator / denominator;
+  const value = numerator / denominator;
+  if (!Number.isFinite(value)) {
+    throw new RangeError("Numerical instability for given inputs");
+  }
+  return value;
 }
 
 export type NperParams = {

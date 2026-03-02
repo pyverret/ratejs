@@ -38,4 +38,15 @@ describe("loans", () => {
     expect(extra.schedule.length).toBeLessThan(base.schedule.length);
     expect(extra.totalInterest).toBeLessThan(base.totalInterest);
   });
+
+  it("loanPayment validates annual rate domain", () => {
+    expect(() =>
+      loanPayment({
+        principal: 100000,
+        annualRate: -12,
+        paymentsPerYear: 12,
+        years: 30,
+      }),
+    ).toThrow(RangeError);
+  });
 });

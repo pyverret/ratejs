@@ -43,35 +43,37 @@ function findBracket(
   lowerBound: number,
   upperBound: number,
 ): { lower: number; upper: number } | undefined {
-  const fLower = fn(lowerBound);
-  const fUpper = fn(upperBound);
-  if (!Number.isFinite(fLower) || !Number.isFinite(fUpper)) return undefined;
-  if (fLower === 0) return { lower: lowerBound, upper: lowerBound };
-  if (fUpper === 0) return { lower: upperBound, upper: upperBound };
-  if (fLower * fUpper < 0) return { lower: lowerBound, upper: upperBound };
+  const scan = (
+    start: number,
+    end: number,
+    segments = 200,
+  ): { lower: number; upper: number } | undefined => {
+    let prevX: number | undefined;
+    let prevValue: number | undefined;
+    for (let i = 0; i <= segments; i++) {
+      const x = start + ((end - start) * i) / segments;
+      const value = fn(x);
+      if (!Number.isFinite(value)) continue;
+      if (value === 0) return { lower: x, upper: x };
+      if (prevX !== undefined && prevValue !== undefined && prevValue * value < 0) {
+        return { lower: prevX, upper: x };
+      }
+      prevX = x;
+      prevValue = value;
+    }
+    return undefined;
+  };
 
   let lower = lowerBound;
   let upper = upperBound;
-  let fLo = fLower;
-  let fHi = fUpper;
   for (let i = 0; i < 20; i++) {
-    const nextLower = Math.max(-0.999999999, (lower - 1) / 2);
-    const fNextLower = fn(nextLower);
-    if (Number.isFinite(fNextLower) && fNextLower * fHi < 0) {
-      return { lower: nextLower, upper };
-    }
-    if (Number.isFinite(fNextLower)) {
-      lower = nextLower;
-      fLo = fNextLower;
-    }
-
+    const bracket = scan(lower, upper);
+    if (bracket !== undefined) return bracket;
+    lower = Math.max(-0.999999999, (lower - 1) / 2);
     upper = upper * 2 + 1;
-    fHi = fn(upper);
-    if (!Number.isFinite(fHi)) continue;
-    if (fLo * fHi < 0) return { lower, upper };
   }
 
-  return undefined;
+  return scan(lower, upper, 400);
 }
 
 export function irr(params: IrrParams): number {

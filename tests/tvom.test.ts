@@ -37,16 +37,18 @@ describe("time value of money", () => {
       rate: -0.5,
       timesPerYear: 1,
     });
-    const withContrib = periodsToReachGoal({
-      principal: 1000,
-      targetFutureValue: 2000,
-      rate: -0.5,
-      timesPerYear: 1,
-      contributionPerPeriod: 10,
-      contributionTiming: "end",
-    });
     expect(noContrib).toBe(Number.POSITIVE_INFINITY);
-    expect(withContrib).toBe(Number.POSITIVE_INFINITY);
+    expect(() =>
+      periodsToReachGoal({
+        principal: 1000,
+        targetFutureValue: 2000,
+        rate: -0.5,
+        timesPerYear: 1,
+        contributionPerPeriod: 10,
+        contributionTiming: "end",
+        maxPeriods: 1000,
+      }),
+    ).toThrow(RangeError);
   });
 
   it("periodsToReachGoal throws when per-period rate is <= -1", () => {
@@ -67,6 +69,30 @@ describe("time value of money", () => {
       periods: 24,
     });
     expect((1 + r) ** 24 * 1000).toBeCloseTo(1500, 8);
+  });
+
+  it("rateToReachGoal throws when rate is undefined for zero principal and contributions", () => {
+    expect(() =>
+      rateToReachGoal({
+        principal: 0,
+        targetFutureValue: 1500,
+        periods: 24,
+        contributionPerPeriod: 0,
+      }),
+    ).toThrow(RangeError);
+  });
+
+  it("periodsToReachGoal throws when maxPeriods cap is exceeded", () => {
+    expect(() =>
+      periodsToReachGoal({
+        principal: 1000,
+        targetFutureValue: 1_000_000,
+        rate: 0.01,
+        timesPerYear: 1,
+        contributionPerPeriod: 1,
+        maxPeriods: 10,
+      }),
+    ).toThrow(RangeError);
   });
 
   it("ruleOf72 approximate doubling", () => {

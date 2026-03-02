@@ -7,6 +7,7 @@ export type PeriodsToReachGoalParams = {
   timesPerYear: number;
   contributionPerPeriod?: number;
   contributionTiming?: "end" | "begin";
+  maxPeriods?: number;
 };
 
 /**
@@ -21,6 +22,7 @@ export function periodsToReachGoal(params: PeriodsToReachGoalParams): number {
     timesPerYear,
     contributionPerPeriod = 0,
     contributionTiming = "end",
+    maxPeriods = 100000,
   } = params;
 
   assertNonNegative(principal, "principal");
@@ -28,6 +30,7 @@ export function periodsToReachGoal(params: PeriodsToReachGoalParams): number {
   assertFiniteNumber(rate, "rate");
   assertPositive(timesPerYear, "timesPerYear");
   assertNonNegative(contributionPerPeriod, "contributionPerPeriod");
+  assertPositive(maxPeriods, "maxPeriods");
 
   if (targetFutureValue <= principal) return 0;
 
@@ -53,11 +56,11 @@ export function periodsToReachGoal(params: PeriodsToReachGoalParams): number {
   // With contributions: iterate until FV >= target
   let fv = principal;
   let periods = 0;
-  const maxPeriods = 10000;
   while (fv < targetFutureValue && periods < maxPeriods) {
     if (contributionTiming === "begin") fv += contributionPerPeriod;
     fv = fv * (1 + r) + (contributionTiming === "end" ? contributionPerPeriod : 0);
     periods++;
   }
-  return fv >= targetFutureValue ? periods : Number.POSITIVE_INFINITY;
+  if (fv >= targetFutureValue) return periods;
+  throw new RangeError("maxPeriods exceeded before reaching target");
 }
