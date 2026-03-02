@@ -71,6 +71,30 @@ describe("time value of money", () => {
     expect((1 + r) ** 24 * 1000).toBeCloseTo(1500, 8);
   });
 
+  it("rateToReachGoal and periodsToReachGoal are consistent", () => {
+    const periods = 72;
+    const ratePerPeriod = rateToReachGoal({
+      principal: 1000,
+      targetFutureValue: 4000,
+      periods,
+      contributionPerPeriod: 25,
+      contributionTiming: "end",
+    });
+
+    const solvedPeriods = periodsToReachGoal({
+      principal: 1000,
+      targetFutureValue: 4000,
+      rate: ratePerPeriod * 12,
+      timesPerYear: 12,
+      contributionPerPeriod: 25,
+      contributionTiming: "end",
+      maxPeriods: 1000,
+    });
+
+    expect(solvedPeriods).toBeGreaterThanOrEqual(periods);
+    expect(solvedPeriods).toBeLessThanOrEqual(periods + 1);
+  });
+
   it("rateToReachGoal throws when rate is undefined for zero principal and contributions", () => {
     expect(() =>
       rateToReachGoal({
@@ -91,6 +115,29 @@ describe("time value of money", () => {
         timesPerYear: 1,
         contributionPerPeriod: 1,
         maxPeriods: 10,
+      }),
+    ).toThrow(RangeError);
+  });
+
+  it("goal functions throw on invalid contributionTiming", () => {
+    expect(() =>
+      rateToReachGoal({
+        principal: 1000,
+        targetFutureValue: 1500,
+        periods: 24,
+        contributionPerPeriod: 10,
+        contributionTiming: "middle" as "end",
+      }),
+    ).toThrow(RangeError);
+
+    expect(() =>
+      periodsToReachGoal({
+        principal: 1000,
+        targetFutureValue: 1500,
+        rate: 0.05,
+        timesPerYear: 12,
+        contributionPerPeriod: 10,
+        contributionTiming: "middle" as "end",
       }),
     ).toThrow(RangeError);
   });

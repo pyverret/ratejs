@@ -44,16 +44,19 @@ const payment = pmt({
   ratePerPeriod: 0.06 / 12,
   periods: 360,
   presentValue: 250000,
-  futureValue: 0,
-  timing: "end",
+  futureValue: 0, // optional
+  timing: "end", // optional
 });
 
 const impliedRate = rate({
   periods: 360,
   payment,
   presentValue: 250000,
-  futureValue: 0,
-  timing: "end",
+  futureValue: 0, // optional
+  timing: "end", // optional
+  guess: 0.1, // optional
+  maxIterations: 100, // optional
+  tolerance: 1e-10, // optional
   lowerBound: -0.99, // optional
   upperBound: 10, // optional
 });
@@ -89,11 +92,11 @@ presentValue({ futureValue: 5000, rate: 0.06, timesPerYear: 12, years: 5 });
 ```ts
 investmentGrowth({
   initial: 1000,
-  contributionPerPeriod: 100,
+  contributionPerPeriod: 100, // optional
   rate: 0.06,
   timesPerYear: 12,
   years: 2,
-  contributionTiming: "end", // or "begin"
+  contributionTiming: "end", // optional ("end" | "begin")
 });
 ```
 
@@ -112,7 +115,8 @@ periodsToReachGoal({
   rate: 0.06,
   timesPerYear: 12,
   contributionPerPeriod: 0, // optional
-  contributionTiming: "end",
+  contributionTiming: "end", // optional
+  maxPeriods: 100000, // optional
 });
 ```
 
@@ -120,6 +124,7 @@ Edge cases:
 - Returns `Infinity` when the goal is unreachable.
 - Throws `RangeError` when `rate / timesPerYear <= -1`.
 - Throws `RangeError` when `maxPeriods` is exceeded for contribution-based iteration.
+- Throws `RangeError` when `contributionTiming` is not `"end"` or `"begin"`.
 
 - **`rateToReachGoal`** - Rate per period required to reach a target future value in a given number of periods.
 
@@ -128,8 +133,10 @@ rateToReachGoal({
   principal: 1000,
   targetFutureValue: 1500,
   periods: 24,
-  contributionPerPeriod: 0,
-  contributionTiming: "end",
+  contributionPerPeriod: 0, // optional
+  contributionTiming: "end", // optional
+  maxIterations: 100, // optional
+  tolerance: 1e-10, // optional
   lowerBound: -0.99, // optional
   upperBound: 10, // optional
 });
@@ -137,6 +144,7 @@ rateToReachGoal({
 
 Edge cases:
 - Throws `RangeError` when no root is found within search bounds.
+- Throws `RangeError` when `contributionTiming` is not `"end"` or `"begin"`.
 
 - **`ruleOf72`** - Approximate years to double a lump sum at a given annual rate. Optional `constant: 69` for rule of 69.
 
@@ -158,8 +166,8 @@ cagr({ startValue: 1000, endValue: 2000, years: 10 });
 ```ts
 irr({
   cashFlows: [-1000, 300, 400, 500],
-  guess: 0.1,
-  maxIterations: 100,
+  guess: 0.1, // optional
+  maxIterations: 100, // optional
   lowerBound: -0.99, // optional
   upperBound: 10, // optional
 });
@@ -204,7 +212,7 @@ presentValueOfAnnuity({
   paymentPerPeriod: 100,
   ratePerPeriod: 0.01,
   periods: 36,
-  timing: "end",
+  timing: "end", // optional
 });
 ```
 
@@ -215,7 +223,7 @@ paymentFromPresentValue({
   presentValue: 100000,
   ratePerPeriod: 0.005,
   periods: 360,
-  timing: "end",
+  timing: "end", // optional
 });
 ```
 
@@ -243,7 +251,7 @@ amortizationSchedule({
   annualRate: 0.06,
   paymentsPerYear: 12,
   years: 30,
-  extraPaymentPerPeriod: 50,
+  extraPaymentPerPeriod: 50, // optional
 });
 ```
 
@@ -280,7 +288,7 @@ Edge cases:
 
 ```ts
 roundToCurrency({ value: 2.125 }); // 2.13
-roundToCurrency({ value: 2.125, decimals: 2, mode: "half-even" });
+roundToCurrency({ value: 2.125, decimals: 2, mode: "half-even" }); // decimals/mode optional
 ```
 
 ## Design

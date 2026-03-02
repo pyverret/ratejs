@@ -13,6 +13,15 @@ export type RateToReachGoalParams = {
   tolerance?: number;
 };
 
+function assertContributionTiming(
+  value: "end" | "begin",
+  name: string,
+): void {
+  if (value !== "end" && value !== "begin") {
+    throw new RangeError(`${name} must be "end" or "begin"`);
+  }
+}
+
 /**
  * Rate per period required to reach target future value in given periods.
  * Uses Newton-Raphson when contributions are present; closed form for lump sum.
@@ -38,6 +47,7 @@ export function rateToReachGoal(params: RateToReachGoalParams): number {
   assertFiniteNumber(upperBound, "upperBound");
   assertFiniteNumber(maxIterations, "maxIterations");
   assertFiniteNumber(tolerance, "tolerance");
+  assertContributionTiming(contributionTiming, "contributionTiming");
   if (lowerBound <= -1) throw new RangeError("lowerBound must be > -1");
   if (upperBound <= lowerBound) throw new RangeError("upperBound must be greater than lowerBound");
   if (!Number.isInteger(maxIterations) || maxIterations <= 0) {
@@ -45,7 +55,6 @@ export function rateToReachGoal(params: RateToReachGoalParams): number {
   }
   if (tolerance <= 0) throw new RangeError("tolerance must be > 0");
 
-  if (periods === 0) return 0;
   if (targetFutureValue <= principal && contributionPerPeriod === 0) return 0;
 
   if (contributionPerPeriod === 0) {

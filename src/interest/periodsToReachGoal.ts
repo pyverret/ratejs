@@ -10,6 +10,15 @@ export type PeriodsToReachGoalParams = {
   maxPeriods?: number;
 };
 
+function assertContributionTiming(
+  value: "end" | "begin",
+  name: string,
+): void {
+  if (value !== "end" && value !== "begin") {
+    throw new RangeError(`${name} must be "end" or "begin"`);
+  }
+}
+
 /**
  * Number of compounding periods until future value reaches the goal.
  * With no contributions: closed form. With contributions: iterative.
@@ -31,6 +40,7 @@ export function periodsToReachGoal(params: PeriodsToReachGoalParams): number {
   assertPositive(timesPerYear, "timesPerYear");
   assertNonNegative(contributionPerPeriod, "contributionPerPeriod");
   assertPositive(maxPeriods, "maxPeriods");
+  assertContributionTiming(contributionTiming, "contributionTiming");
 
   if (targetFutureValue <= principal) return 0;
 
