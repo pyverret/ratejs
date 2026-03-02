@@ -10,10 +10,7 @@ export type PeriodsToReachGoalParams = {
   maxPeriods?: number;
 };
 
-function assertContributionTiming(
-  value: "end" | "begin",
-  name: string,
-): void {
+function assertContributionTiming(value: "end" | "begin", name: string): void {
   if (value !== "end" && value !== "begin") {
     throw new RangeError(`${name} must be "end" or "begin"`);
   }

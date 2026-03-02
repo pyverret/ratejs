@@ -8,6 +8,12 @@ Lightweight, dependency-free TypeScript financial math library providing pure ca
 npm i @pyverret/ratejs
 ```
 
+## Validate Before Push
+
+```bash
+npm run validate
+```
+
 ## Live Demo
 
 - GitHub Pages URL: `https://pyverret.github.io/ratejs/`

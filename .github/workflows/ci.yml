@@ -18,10 +18,7 @@ jobs:
           node-version: ${{ matrix.node }}
           cache: npm
       - run: npm ci
-      - run: npm run lint
-      - run: npm run typecheck
-      - run: npm test
-      - run: npm run build
+      - run: npm run validate
       - run: npm ci
         working-directory: demo
         if: matrix.node == '20.19.0'
