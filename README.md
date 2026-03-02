@@ -14,18 +14,6 @@ npm i @pyverret/ratejs
 npm run validate
 ```
 
-## Automated Releases
-
-Releases are managed by `semantic-release` on pushes to `main`.
-
-Required GitHub secrets:
-- `NPM_TOKEN`: npm automation token with publish access.
-
-Behavior:
-- Conventional Commits drive version bumps (`fix` = patch, `feat` = minor, `feat!` or `BREAKING CHANGE` = major).
-- Release workflow runs `npm run validate` before publishing.
-- Git tags use format `vX.Y.Z`.
-
 ## Live Demo
 
 - GitHub Pages URL: `https://pyverret.github.io/ratejs/`
