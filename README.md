@@ -16,7 +16,7 @@ npm run validate
 
 ## Live Demo
 
-- GitHub Pages URL: `https://pyverret.github.io/ratejs/`
+- GitHub Pages URL: [https://pyverret.github.io/ratejs/](https://pyverret.github.io/ratejs/)
 - Demo source: [`demo/`](./demo)
 
 Run locally:
