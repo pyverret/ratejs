@@ -63,6 +63,29 @@ h1 {
   color: var(--muted);
 }
 
+.project-description {
+  margin: 10px 0 0;
+  max-width: 72ch;
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+
+.project-links {
+  margin: 8px 0 0;
+}
+
+.project-links a {
+  color: #0b6fda;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.85rem;
+}
+
+.project-links a:hover {
+  color: #0958ab;
+}
+
 .grid {
   display: grid;
   gap: 22px;
