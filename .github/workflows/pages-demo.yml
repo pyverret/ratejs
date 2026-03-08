@@ -38,8 +38,11 @@ jobs:
         working-directory: demo
 
       - name: Build demo for Pages
-        run: npm run build -- --base=/${{ github.event.repository.name }}/
+        run: npm run build -- --base=./
         working-directory: demo
+
+      - name: Add custom domain
+        run: echo "ratejs.com" > demo/dist/CNAME
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
