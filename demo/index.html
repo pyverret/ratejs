@@ -10,6 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
+    <meta name="cf-beacon-token" content="be209f2e61424799989a132f85a13e72" />
   </head>
   <body>
     <main class="app">
@@ -33,5 +34,19 @@
     </main>
 
     <script type="module" src="./src/main.js"></script>
+    <script>
+      const beaconToken = document
+        .querySelector('meta[name="cf-beacon-token"]')
+        ?.getAttribute("content")
+        ?.trim();
+
+      if (beaconToken) {
+        const script = document.createElement("script");
+        script.defer = true;
+        script.src = "https://static.cloudflareinsights.com/beacon.min.js";
+        script.setAttribute("data-cf-beacon", JSON.stringify({ token: beaconToken }));
+        document.head.appendChild(script);
+      }
+    </script>
   </body>
 </html>
